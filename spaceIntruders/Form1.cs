@@ -13,17 +13,17 @@ namespace spaceIntruders
 {
     public partial class Form1 : Form
     {
-        Rectangle player = new Rectangle(280, 540, 40, 10);
-
-
-        int moveTimer = 0;
-
-        int alienSpeed = 1;
-
-        int playerSpeed = 10;
+        Rectangle player = new Rectangle(280, 540, 40, 40);
 
         List<Rectangle> alien = new List<Rectangle>();
-        List<int> alienSpeeds = new List<int>();
+        List<Rectangle> alienBullet = new List<Rectangle>();
+        List<Rectangle> playerBullet = new List<Rectangle>();
+
+        int bulletSpeed = -20;
+
+        int alienSpeed = 2;
+
+        int playerSpeed = 10;
 
         int alienSize = 25;
 
@@ -35,8 +35,10 @@ namespace spaceIntruders
         string gameState = "waiting";
 
         SolidBrush greenBrush = new SolidBrush(Color.LimeGreen);
+        SolidBrush redBrush = new SolidBrush(Color.Red);
 
-        Image blue = Properties.Resources.alien2;
+        Image alienImage = Properties.Resources.alien2;
+        Image spaceshipImage = Properties.Resources.spaceship;
 
         Random randGen = new Random();
         int randValue = 0;
@@ -48,15 +50,19 @@ namespace spaceIntruders
 
         public void GameInitialize()
         {
+            gameState = "running";
 
             titleLabel.Text = "";
             subTitleLabel.Text = "";
 
+            titleLabel.Visible = false;
+            subTitleLabel.Visible = false;
             gameTimer.Enabled = true;
-            gameState = "running";
+
             score = 0;
+            scoreLabel.Text = $"Score {score}";
+
             alien.Clear();
-            alienSpeeds.Clear();
 
             player.X = 280;
             player.Y = 540;
@@ -105,18 +111,32 @@ namespace spaceIntruders
 
         private void Form1_MouseClick(object sender, MouseEventArgs e)
         {
-
+            //spawn bullet when mouse clicked
+            playerBullet.Add(new Rectangle(player.X + 20, player.Y, 5, 5));
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
         {
+            //game boarder
+            Rectangle boarder = new Rectangle(5, 5, this.Width - 10, this.Height - 10);
 
             //move player
             movePlayer();
 
+            //move alien
             moveAlien();
 
-            moveTimer++;
+            //alien collision with walls
+            alienCollisionWalls();
+
+            //move bullet
+            moveBullet();
+
+            //bullet collision with alien
+            alienCollisionBullet();
+
+            //alien speed change
+            alienSpeedChange();
 
             Refresh();
         }
@@ -132,12 +152,18 @@ namespace spaceIntruders
             }
             else if (gameState == "running")
             {
-                e.Graphics.FillRectangle(greenBrush, player);
+                //e.Graphics.FillRectangle(greenBrush, player);
+                e.Graphics.DrawImage(spaceshipImage, player);
+
+                for (int i = 0; i < playerBullet.Count(); i++)
+                {
+                    e.Graphics.FillRectangle(redBrush, playerBullet[i]);
+
+                }
 
                 for (int i = 0; i < alien.Count(); i++)
                 {
-                    //e.Graphics.FillRectangle(greenBrush, alien[i]);
-                    e.Graphics.DrawImage(blue, alien[i]);
+                    e.Graphics.DrawImage(alienImage, alien[i]);
                 }
             }
         }
@@ -159,7 +185,7 @@ namespace spaceIntruders
         //spawn aliens
         public void spawnAlien()
         {
-            int rows = 5;           // number of rows
+            int rows = 4;           // number of rows
             int numbAliens = 11;    //number of aliens in each row
             int gap = 20;           // gap in between each alien
             int x = 20;             //starting x
@@ -188,7 +214,102 @@ namespace spaceIntruders
             }
         }
 
+        //When alien collides with boarder
+        public void alienCollisionWalls()
+        {
+            for (int i = 0; i < alien.Count(); i++)
+            {
+                if (alien[i].X <= 10)
+                {
+                    alienSpeed *= -1;
 
+                    for (int j = 0; j < alien.Count(); j++)
+                    {
+                        int y = alien[j].Y + 15;
+                        int x = alien[j].X + 4;
+                        alien[j] = new Rectangle(x, y, alienSize, alienSize);
+                    }
+                }
+                else if (alien[i].X >= this.Height - alienSize - 10)
+                {
+                    alienSpeed *= -1;
+
+                    for (int j = 0; j < alien.Count(); j++)
+                    {
+                        int y = alien[j].Y + 15;
+                        int x = alien[j].X - 4;
+                        alien[j] = new Rectangle(x, y, alienSize, alienSize);
+                    }
+                }
+            }
+        }
+
+        //move bullet
+        public void moveBullet()
+        {
+            for (int i = 0; i < playerBullet.Count(); i++)
+            {
+                int y = playerBullet[i].Y + bulletSpeed;
+                playerBullet[i] = new Rectangle(playerBullet[i].X, y, 5, 20);
+            }
+        }
+
+        //alien collision with bullet
+        public void alienCollisionBullet()  
+        {
+            for (int i = 0; i < playerBullet.Count(); i++)
+            {
+                for (int j = 0; j < alien.Count(); j++)
+                {
+                    if (playerBullet[i].IntersectsWith(alien[j]))
+                    {
+                        playerBullet.RemoveAt(i);
+                        alien.RemoveAt(j);
+                        score += 50;
+                        scoreLabel.Text = $"Score {score}";
+                        break;
+                    }
+                }
+            }
+        }
+
+        //alien speed change
+        public void alienSpeedChange()
+        {
+            if (alien.Count == 40)
+            {
+                if (alienSpeed > 0)
+                {
+                    alienSpeed = 3;
+                }
+                else
+                {
+                    alienSpeed = -3;
+                }
+            }
+            else if (alien.Count == 25)
+            {
+                if (alienSpeed > 0)
+                {
+                    alienSpeed = 4;
+                }
+                else
+                {
+                    alienSpeed = -4;
+                }
+            }
+            else if (alien.Count == 1)
+            {
+                if (alienSpeed > 0)
+                {
+                    alienSpeed = 20;
+                }
+                else
+                {
+                    alienSpeed = -20;
+                }
+            }
+        }
 
 
     }

@@ -66,12 +66,12 @@ namespace spaceIntruders
             this.scoreLabel.BackColor = System.Drawing.Color.Transparent;
             this.scoreLabel.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.scoreLabel.ForeColor = System.Drawing.Color.Lime;
-            this.scoreLabel.Location = new System.Drawing.Point(2, 0);
+            this.scoreLabel.Location = new System.Drawing.Point(0, 0);
             this.scoreLabel.Name = "scoreLabel";
             this.scoreLabel.Size = new System.Drawing.Size(100, 23);
             this.scoreLabel.TabIndex = 5;
             this.scoreLabel.Text = "scoreLabel";
-            this.scoreLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.scoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // livesLabel
             // 
