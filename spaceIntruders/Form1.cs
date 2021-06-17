@@ -20,6 +20,7 @@ namespace spaceIntruders
         List<Rectangle> playerBullet = new List<Rectangle>();
 
         int bulletSpeed = -20;
+        int alienBulletSpeed = 20;
 
         int alienSpeed = 2;
 
@@ -138,6 +139,13 @@ namespace spaceIntruders
             //alien speed change
             alienSpeedChange();
 
+            //create alien bullets
+            spawnAlienBullet();
+
+            //move alien bullet
+            moveAlienBullet();
+
+
             Refresh();
         }
 
@@ -155,16 +163,26 @@ namespace spaceIntruders
                 //e.Graphics.FillRectangle(greenBrush, player);
                 e.Graphics.DrawImage(spaceshipImage, player);
 
+                //draw alien image
+                for (int i = 0; i < alien.Count(); i++)
+                {
+                    e.Graphics.DrawImage(alienImage, alien[i]);
+                }
+
+                //draw players bullets
                 for (int i = 0; i < playerBullet.Count(); i++)
                 {
                     e.Graphics.FillRectangle(redBrush, playerBullet[i]);
 
                 }
 
-                for (int i = 0; i < alien.Count(); i++)
+                //draw aliens bullets
+                for (int i = 0; i < alienBullet.Count(); i++)
                 {
-                    e.Graphics.DrawImage(alienImage, alien[i]);
+                    e.Graphics.FillRectangle(redBrush, alienBullet[i]);
+
                 }
+
             }
         }
 
@@ -255,7 +273,7 @@ namespace spaceIntruders
         }
 
         //alien collision with bullet
-        public void alienCollisionBullet()  
+        public void alienCollisionBullet()
         {
             for (int i = 0; i < playerBullet.Count(); i++)
             {
@@ -308,6 +326,31 @@ namespace spaceIntruders
                 {
                     alienSpeed = -20;
                 }
+            }
+        }
+
+        //spawn alien bullets
+        public void spawnAlienBullet()
+        {
+            randValue = randGen.Next(0, 101);
+
+            if (randValue < 5)
+            {
+                for (int i = 0; i < alien.Count(); i++)
+                {
+                    alienBullet.Add(new Rectangle(alien[i].X, alien[i].Y + 20, 5, 5));
+                    break;
+                }
+            }
+        }
+
+        //move alien bullets
+        public void moveAlienBullet()
+        {
+            for (int i = 0; i < alienBullet.Count(); i++)
+            {
+                int y = alienBullet[i].Y + alienBulletSpeed;
+                alienBullet[i] = new Rectangle(alienBullet[i].X, y, 5, 20);
             }
         }
 
