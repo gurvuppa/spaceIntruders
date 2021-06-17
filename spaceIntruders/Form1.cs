@@ -1,4 +1,11 @@
-﻿using System;
+﻿/* Gurvir Uppal
+ * Space Intruders Final Project
+ * Mr.T
+ * ICS3U
+ * June 17, 2021
+ */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Media;
 
 namespace spaceIntruders
 {
@@ -23,19 +31,25 @@ namespace spaceIntruders
         int alienBulletSpeed = 20;
 
         int alienSpeed = 2;
-
         int playerSpeed = 10;
 
         int alienSize = 25;
 
+        int soundCounter;
+
         int score = 0;
+        int lives = 3;
 
         bool aDown = false;
         bool dDown = false;
 
         string gameState = "waiting";
 
-        SolidBrush greenBrush = new SolidBrush(Color.LimeGreen);
+        SoundPlayer musicPlayer;
+        SoundPlayer shootPlayer;
+        SoundPlayer movingSound;
+        SoundPlayer moving2Sound;
+
         SolidBrush redBrush = new SolidBrush(Color.Red);
 
         Image alienImage = Properties.Resources.alien2;
@@ -52,21 +66,34 @@ namespace spaceIntruders
         public void GameInitialize()
         {
             gameState = "running";
+            gameTimer.Enabled = true;
 
             titleLabel.Text = "";
             subTitleLabel.Text = "";
 
             titleLabel.Visible = false;
             subTitleLabel.Visible = false;
-            gameTimer.Enabled = true;
+
+            life1label.Visible = true;
+            life2Label.Visible = true;
+            life3Label.Visible = true;
+
+            alienSpeed = 2;
 
             score = 0;
+            lives = 3;
+
             scoreLabel.Text = $"Score {score}";
 
             alien.Clear();
+            alienBullet.Clear();
+            playerBullet.Clear();
 
             player.X = 280;
             player.Y = 540;
+
+            movingSound = new SoundPlayer(Properties.Resources.fastinvader1);
+            movingSound.Play();
 
             //spawn alien
             spawnAlien();
@@ -83,13 +110,13 @@ namespace spaceIntruders
                     dDown = true;
                     break;
                 case Keys.Space:
-                    if (gameState == "waiting" || gameState == "over")
+                    if (gameState == "waiting" || gameState == "over" || gameState == "winner")
                     {
                         GameInitialize();
                     }
                     break;
                 case Keys.Escape:
-                    if (gameState == "waiting" || gameState == "over")
+                    if (gameState == "waiting" || gameState == "over" || gameState == "winner")
                     {
                         Application.Exit();
                     }
@@ -114,6 +141,13 @@ namespace spaceIntruders
         {
             //spawn bullet when mouse clicked
             playerBullet.Add(new Rectangle(player.X + 20, player.Y, 5, 5));
+
+            if (gameTimer.Enabled)
+            {
+                shootPlayer = new SoundPlayer(Properties.Resources.shoot);
+                shootPlayer.Play();
+            }
+            
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -145,6 +179,22 @@ namespace spaceIntruders
             //move alien bullet
             moveAlienBullet();
 
+            //if bullet hits player 
+            playerCollisionBullet();
+
+            //if aliens reach the end
+            aliensReachPlayer();
+
+            //game over
+            gameOver();
+
+            //winner
+            winner();
+
+            //change sound
+            speedSoundChange();
+
+            soundCounter++;
 
             Refresh();
         }
@@ -155,6 +205,7 @@ namespace spaceIntruders
             {
                 livesLabel.Text = "";
                 scoreLabel.Text = "";
+
                 titleLabel.Text = "SPACE INTRUDERS";
                 subTitleLabel.Text = "Press Space Bar to Start or Escape to Exit";
             }
@@ -173,16 +224,74 @@ namespace spaceIntruders
                 for (int i = 0; i < playerBullet.Count(); i++)
                 {
                     e.Graphics.FillRectangle(redBrush, playerBullet[i]);
-
                 }
 
                 //draw aliens bullets
                 for (int i = 0; i < alienBullet.Count(); i++)
                 {
                     e.Graphics.FillRectangle(redBrush, alienBullet[i]);
-
                 }
 
+                if (lives == 3)
+                {
+                    livesLabel.Text = $"lives";
+                    life1label.Image = Properties.Resources.spaceship;
+                    life2Label.Image = Properties.Resources.spaceship;
+                    life3Label.Image = Properties.Resources.spaceship;
+                }
+                else if (lives == 2)
+                {
+                    livesLabel.Text = $"lives";
+                    life3Label.Visible = false;
+                }
+                else if (lives == 1)
+                {
+                    livesLabel.Text = $"lives";
+                    life1label.Image = Properties.Resources.spaceship;
+                    life2Label.Visible = false;
+                    life3Label.Visible = false;
+                }
+                else
+                {
+                    livesLabel.Text = $"lives";
+                    life1label.Visible = false;
+                    life2Label.Visible = false;
+                    life3Label.Visible = false;
+                }
+            }
+            else if (gameState == "over")
+            {
+                scoreLabel.Text = "";
+                livesLabel.Text = "";
+
+                life1label.Visible = false;
+                life2Label.Visible = false;
+                life3Label.Visible = false;
+
+                titleLabel.Visible = true;
+                subTitleLabel.Visible = true;
+
+                titleLabel.Text = "GAME OVER";
+                subTitleLabel.Text = $"Your final score was {score}";
+
+                subTitleLabel.Text += "\nPress Space Barto Play Again or Escape to Exit";
+            }
+            else if (gameState == "winner")
+            {
+                scoreLabel.Text = "";
+                livesLabel.Text = "";
+
+                life1label.Visible = false;
+                life2Label.Visible = false;
+                life3Label.Visible = false;
+
+                titleLabel.Visible = true;
+                subTitleLabel.Visible = true;
+
+                titleLabel.Text = "You Saved The World!!";
+                subTitleLabel.Text = $"Your final score was {score}";
+
+                subTitleLabel.Text += "\nPress Space Bar to Play Again or Escape to Exit";
             }
         }
 
@@ -262,7 +371,7 @@ namespace spaceIntruders
             }
         }
 
-        //move bullet
+        //move bullet   
         public void moveBullet()
         {
             for (int i = 0; i < playerBullet.Count(); i++)
@@ -283,6 +392,8 @@ namespace spaceIntruders
                     {
                         playerBullet.RemoveAt(i);
                         alien.RemoveAt(j);
+                        musicPlayer = new SoundPlayer(Properties.Resources.invaderkilled);
+                        musicPlayer.Play();
                         score += 50;
                         scoreLabel.Text = $"Score {score}";
                         break;
@@ -309,11 +420,15 @@ namespace spaceIntruders
             {
                 if (alienSpeed > 0)
                 {
-                    alienSpeed = 4;
+                    alienSpeed = 5;
+
+                    movingSound = new SoundPlayer(Properties.Resources.fastinvader2);
                 }
                 else
                 {
-                    alienSpeed = -4;
+                    alienSpeed = -5;
+
+                    movingSound = new SoundPlayer(Properties.Resources.fastinvader2);
                 }
             }
             else if (alien.Count == 1)
@@ -321,10 +436,14 @@ namespace spaceIntruders
                 if (alienSpeed > 0)
                 {
                     alienSpeed = 20;
+
+                    movingSound = new SoundPlayer(Properties.Resources.fastinvader4);
                 }
                 else
                 {
                     alienSpeed = -20;
+
+                    movingSound = new SoundPlayer(Properties.Resources.fastinvader4);
                 }
             }
         }
@@ -336,11 +455,13 @@ namespace spaceIntruders
 
             if (randValue < 5)
             {
-                for (int i = 0; i < alien.Count(); i++)
-                {
-                    alienBullet.Add(new Rectangle(alien[i].X, alien[i].Y + 20, 5, 5));
-                    break;
-                }
+                randValue = randGen.Next(0, alien.Count);   //pick a random alien
+
+                int y = randGen.Next(alien[randValue].Y, alien[randValue].Y);  //get that random aliens X and put it into x
+                int x = randGen.Next(alien[randValue].X, alien[randValue].X);  //get that random aliens Y and put it into y
+
+                alienBullet.Add(new Rectangle(x, y + 20, 5, 5));               //spawn a bullet at x and y + 20
+
             }
         }
 
@@ -354,6 +475,79 @@ namespace spaceIntruders
             }
         }
 
+        //if alien bullet hits player
+        public void playerCollisionBullet()
+        {
+            for (int i = 0; i < alienBullet.Count(); i++)
+            {
+                if (alienBullet[i].IntersectsWith(player))
+                {
+                    alienBullet.RemoveAt(i);
+                    lives--;
+                    musicPlayer = new SoundPlayer(Properties.Resources.explosion);
+                    musicPlayer.Play();
+                    break;
+                }
+            }
+        }
+
+        //alien reach player
+        public void aliensReachPlayer()
+        {
+            for (int i = 0; i < alien.Count(); i++)
+            {
+                if (alien[i].Y > this.Height - 60)
+                {
+                    gameTimer.Enabled = false;
+                    gameState = "over";
+                    musicPlayer = new SoundPlayer(Properties.Resources.Game_Over_Arcade___Sound_Effect_HD);
+                    musicPlayer.Play();
+                }
+            }
+        }
+
+        //speed sound change
+        public void speedSoundChange()
+        {
+            if (soundCounter == 30 && alien.Count > 2)
+            {
+                movingSound = new SoundPlayer(Properties.Resources.fastinvader2);
+                movingSound.Play();
+                soundCounter = 0;
+            }
+            else if (soundCounter == 30 && alien.Count == 1)
+            {
+                movingSound.Stop();
+                moving2Sound = new SoundPlayer(Properties.Resources.fastinvader4);
+                moving2Sound.Play();
+                soundCounter = 0;
+            }
+        }
+
+        //game over
+        public void gameOver()
+        {
+            if (lives == 0)
+            {
+                gameTimer.Enabled = false;
+                gameState = "over";
+                musicPlayer = new SoundPlayer(Properties.Resources.Game_Over_Arcade___Sound_Effect_HD);
+                musicPlayer.Play();
+            }
+        }
+
+        //winnneraaaad
+        public void winner()
+        {
+            if (alien.Count == 0)
+            {
+                shootPlayer.Stop();
+                gameTimer.Enabled = false;
+                gameState = "winner";
+                musicPlayer = new SoundPlayer(Properties.Resources.Success__win_sound_effect);
+                musicPlayer.Play();
+            }
+        }
 
     }
 }

@@ -35,6 +35,9 @@ namespace spaceIntruders
             this.scoreLabel = new System.Windows.Forms.Label();
             this.livesLabel = new System.Windows.Forms.Label();
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
+            this.life2Label = new System.Windows.Forms.Label();
+            this.life3Label = new System.Windows.Forms.Label();
+            this.life1label = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // titleLabel
@@ -56,7 +59,7 @@ namespace spaceIntruders
             this.subTitleLabel.ForeColor = System.Drawing.Color.MediumTurquoise;
             this.subTitleLabel.Location = new System.Drawing.Point(68, 262);
             this.subTitleLabel.Name = "subTitleLabel";
-            this.subTitleLabel.Size = new System.Drawing.Size(450, 27);
+            this.subTitleLabel.Size = new System.Drawing.Size(450, 85);
             this.subTitleLabel.TabIndex = 4;
             this.subTitleLabel.Text = "subTitleLabel";
             this.subTitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -78,17 +81,44 @@ namespace spaceIntruders
             this.livesLabel.BackColor = System.Drawing.Color.Transparent;
             this.livesLabel.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.livesLabel.ForeColor = System.Drawing.Color.Lime;
-            this.livesLabel.Location = new System.Drawing.Point(457, 0);
+            this.livesLabel.Location = new System.Drawing.Point(365, 0);
             this.livesLabel.Name = "livesLabel";
-            this.livesLabel.Size = new System.Drawing.Size(100, 23);
+            this.livesLabel.Size = new System.Drawing.Size(100, 41);
             this.livesLabel.TabIndex = 6;
             this.livesLabel.Text = "livesLabel";
-            this.livesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.livesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // gameTimer
             // 
             this.gameTimer.Interval = 20;
             this.gameTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
+            // 
+            // life2Label
+            // 
+            this.life2Label.BackColor = System.Drawing.Color.Black;
+            this.life2Label.Location = new System.Drawing.Point(512, 6);
+            this.life2Label.Name = "life2Label";
+            this.life2Label.Size = new System.Drawing.Size(35, 35);
+            this.life2Label.TabIndex = 7;
+            this.life2Label.Text = "life2";
+            // 
+            // life3Label
+            // 
+            this.life3Label.BackColor = System.Drawing.Color.Black;
+            this.life3Label.Location = new System.Drawing.Point(553, 6);
+            this.life3Label.Name = "life3Label";
+            this.life3Label.Size = new System.Drawing.Size(35, 35);
+            this.life3Label.TabIndex = 8;
+            this.life3Label.Text = "life3";
+            // 
+            // life1label
+            // 
+            this.life1label.BackColor = System.Drawing.Color.Black;
+            this.life1label.Location = new System.Drawing.Point(471, 6);
+            this.life1label.Name = "life1label";
+            this.life1label.Size = new System.Drawing.Size(35, 35);
+            this.life1label.TabIndex = 9;
+            this.life1label.Text = "life1";
             // 
             // Form1
             // 
@@ -96,6 +126,9 @@ namespace spaceIntruders
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(600, 600);
+            this.Controls.Add(this.life1label);
+            this.Controls.Add(this.life3Label);
+            this.Controls.Add(this.life2Label);
             this.Controls.Add(this.livesLabel);
             this.Controls.Add(this.scoreLabel);
             this.Controls.Add(this.subTitleLabel);
@@ -120,6 +153,9 @@ namespace spaceIntruders
         private System.Windows.Forms.Label scoreLabel;
         private System.Windows.Forms.Label livesLabel;
         private System.Windows.Forms.Timer gameTimer;
+        private System.Windows.Forms.Label life2Label;
+        private System.Windows.Forms.Label life3Label;
+        private System.Windows.Forms.Label life1label;
     }
 }
 
