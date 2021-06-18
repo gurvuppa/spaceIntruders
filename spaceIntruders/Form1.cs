@@ -271,7 +271,7 @@ namespace spaceIntruders
                 titleLabel.Text = "GAME OVER";
                 subTitleLabel.Text = $"Your final score was {score}";
 
-                subTitleLabel.Text += "\nPress Space Barto Play Again or Escape to Exit";
+                subTitleLabel.Text += "\nPress Space Bar to Play Again or Escape to Exit";
             }
             else if (gameState == "winner")
             {
