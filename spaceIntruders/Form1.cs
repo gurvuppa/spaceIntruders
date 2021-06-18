@@ -92,9 +92,6 @@ namespace spaceIntruders
             player.X = 280;
             player.Y = 540;
 
-            movingSound = new SoundPlayer(Properties.Resources.fastinvader1);
-            movingSound.Play();
-
             //spawn alien
             spawnAlien();
         }
@@ -142,12 +139,12 @@ namespace spaceIntruders
             //spawn bullet when mouse clicked
             playerBullet.Add(new Rectangle(player.X + 20, player.Y, 5, 5));
 
-            if (gameTimer.Enabled)
+            //stops it so the game end sound doesnt glitch and not play
+            if (gameTimer.Enabled == true)
             {
                 shootPlayer = new SoundPlayer(Properties.Resources.shoot);
                 shootPlayer.Play();
             }
-            
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -453,7 +450,7 @@ namespace spaceIntruders
         {
             randValue = randGen.Next(0, 101);
 
-            if (randValue < 5)
+            if (randValue < 6)
             {
                 randValue = randGen.Next(0, alien.Count);   //pick a random alien
 
